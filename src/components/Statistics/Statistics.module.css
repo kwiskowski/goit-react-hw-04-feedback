@@ -1,0 +1,12 @@
+.statistics {
+  display: flex;
+  flex-direction: column;
+  font-size: 26px;
+  margin-bottom: 20px;
+  margin-left: 20px;
+}
+
+.notification {
+  color: rgb(20, 110, 26);
+  font-weight: bold;
+}
