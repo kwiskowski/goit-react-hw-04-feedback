@@ -1,74 +1,75 @@
-import React, { Component } from 'react';
+import { useState, useRef } from 'react';
 import { FeedbackButtons } from './FeedbackButton/FeedbackButton';
 import { Statistics } from './Statistics/Statistics';
 import { Section } from './Section/Section';
 
-export class App extends Component {
-  state = {
-    good: 0,
-    neutral: 0,
-    bad: 0,
+export const App = () => {
+  const [Good, setGood] = useState(0);
+  const [Neutral, setNeutral] = useState(0);
+  const [Bad, setBad] = useState(0);
+  const totalFeedback = useRef(0);
+  const percentagePositive = useRef(0);
+
+  const handleGood = () => {
+    setGood(Good + 1);
+    countTotalFeedback();
+    countPercentagePositive();
   };
 
-  // handleFeedback = event => {
-  //   console.log(this.state);
-
-  //   this.setState(prevState => {
-  //     return {
-  //       [event.target.innerHTML]: prevState[event.target.innerHTML] + 1,
-  //     };
-  //   });
-  // };
-
-  handleFeedback = type => {
-    this.setState(prevState => ({
-      [type]: prevState[type] + 1,
-    }));
+  const handleNeutral = () => {
+    setNeutral(Neutral + 1);
+    countTotalFeedback();
+    countPercentagePositive();
   };
 
-  countTotalFeedback = () => {
-    const { good, neutral, bad } = this.state;
-    return good + neutral + bad;
+  const handleBad = () => {
+    setBad(Bad + 1);
+    countTotalFeedback();
+    countPercentagePositive();
   };
 
-  countPositiveFeedbackPercentage = () => {
-    const { good } = this.state;
-    const totalFeedback = this.countTotalFeedback();
-    return totalFeedback === 0 ? 0 : Math.round((good / totalFeedback) * 100);
+  const countTotalFeedback = () => {
+    totalFeedback.current = Good + Neutral + Bad;
   };
-
-  render() {
-    const { good, neutral, bad } = this.state;
-    const totalFeedback = this.countTotalFeedback();
-    const positivePercentage = this.countPositiveFeedbackPercentage();
-    return (
-      <div
-        style={{
-          height: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          fontSize: 40,
-          color: '#010101',
-        }}
-      >
-        <Section title={'Please leave feedback'}>
-          <FeedbackButtons
-            options={['good', 'neutral', 'bad']}
-            onFeedback={this.handleFeedback}
-          />
-        </Section>
-        <Section title={'Statistics'}>
-          <Statistics
-            good={good}
-            neutral={neutral}
-            bad={bad}
-            total={totalFeedback}
-            positivePercentage={positivePercentage}
-          />
-        </Section>
-      </div>
+  const countPercentagePositive = () => {
+    percentagePositive.current = Math.round(
+      (Good / totalFeedback.current) * 100
     );
-  }
-}
+  };
+
+  return (
+    <div
+      style={{
+        height: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        fontSize: 40,
+        color: '#010101',
+      }}
+    >
+      <Section title={'Please leave feedback'}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+          }}
+        >
+          <FeedbackButtons label={'Good'} onFeedback={handleGood} />
+          <FeedbackButtons label={'Neutral'} onFeedback={handleNeutral} />
+          <FeedbackButtons label={'Bad'} onFeedback={handleBad} />
+        </div>
+      </Section>
+      <Section title={'Statistics'}>
+        <Statistics
+          good={Good}
+          neutral={Neutral}
+          bad={Bad}
+          total={totalFeedback.current}
+          positivePercentage={percentagePositive.current}
+        />
+      </Section>
+    </div>
+  );
+};
